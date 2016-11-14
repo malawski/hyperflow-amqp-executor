@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+require "amqp"
+require "recursive-open-struct"
+require "json"
+require 'socket'
+require 'date'
+
+
+hostname = (ENV['VISOR_HOST'] or 'localhost') 
+port = (ENV['VISOR_PORT'] or 49152)
+
+socket = TCPSocket.open(hostname, port)
+
+EM.run do
+  AMQP.connect(ENV['AMQP_URL']) do |connection|
+    warn "Connected to AMQP broker..."
+
+    channel  = AMQP::Channel.new(connection)
+    queue    = channel.queue("", auto_delete: true, durable: false)
+    queue.bind("hyperflow.events", routing_key: "job.*.finished")
+
+    queue.subscribe do |payload|
+      data = RecursiveOpenStruct.new(JSON.parse(payload))
+      if data.metrics
+        socket.puts [
+              "runtime",
+              data.metrics.execution,
+              DateTime.now.strftime('%Q')
+           ].map {|v| if v.nil? then "NA" else v end }.join(" ")
+      else
+        warn payload
+      end
+    end
+    Signal.trap("INT") { 
+      socket.close
+      connection.close { EM.stop } 
+    }
+  end
+end
