@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.date = "2015-05-28"
   s.description = "AMQP job executor for Hyperflow workflow engine (http://github.com/dice-cyfronet/hyperflow)"
   s.email = "kamil.figiela@gmail.com"
-  s.executables = ["hyperflow-amqp-executor", "hyperflow-amqp-metric-collector"]
+  s.executables = ["hyperflow-amqp-executor", "hyperflow-amqp-metric-collector", "hyperflow-amqp-metric-collector-paasage"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/hyperflow-amqp-executor",
     "bin/hyperflow-amqp-metric-collector",
+    "bin/hyperflow-amqp-metric-collector-paasage",
     "example/settings.yml",
     "hyperflow-amqp-executor.gemspec",
     "lib/hyperflow-amqp-executor.rb",
